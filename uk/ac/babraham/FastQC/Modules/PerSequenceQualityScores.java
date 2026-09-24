@@ -90,18 +90,20 @@ public class PerSequenceQualityScores extends AbstractQCModule {
 				
 		String qual = sequence.getQualityString();
 		int qualLen = qual.length();
-		int averageQuality = 0;
+		long qualitySum = 0;
 		
 		for (int i=0;i<qualLen;i++) {
 			char ch = qual.charAt(i);
 			if (ch < lowestChar) {
 				lowestChar = ch;
 			}
-			averageQuality += ch;
+			qualitySum += ch;
 		}
 
 		if (qualLen > 0) {
-			averageQuality /= qualLen;
+			// Round the mean to the nearest integer rather than truncating
+			// it, so the histogram is centred on the true per-read means.
+			int averageQuality = (int)Math.round(qualitySum/(double)qualLen);
 					
 			if (averageScoreCounts.containsKey(averageQuality)) {
 				long currentCount = averageScoreCounts.get(averageQuality);
